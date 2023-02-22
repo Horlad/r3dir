@@ -112,7 +112,7 @@ Out-of-box setup with Let's Encrypt wildcard TLS certificates autorenewal (for H
 
 2. Fill environment file (`.env`) with your registered domain (`APP_DOMAIN`), DigitalOcean API token with `read` and `write` scopes (`DO_AUTH_TOKEN`) and email for  Let's Encrypt (`LETSENCRYPT_EMAIL`)
 ```bash
-echo "APP_DOMAIN=YOUR_DOMAIN\nDO_AUTH_TOKEN=DO_TOKEN\nLETSENCRYPT_EMAIL=YOUR@EMAIL.COM" > .env
+echo $'APP_DOMAIN=YOUR_DOMAIN\nDO_AUTH_TOKEN=DO_TOKEN\nLETSENCRYPT_EMAIL=YOUR@EMAIL.COM' > .env
 ```
 
 3. Docker Compose startup (Traefik + HTTP server)
