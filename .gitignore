@@ -49,3 +49,9 @@ env.bak/
 venv.bak/
 
 .DS_Store
+
+#VS Code
+.vscode/
+
+#Pytest Cache
+.pytest_cache/
