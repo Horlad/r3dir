@@ -9,24 +9,39 @@ IGNORE_PART_SEP = "--"
 MAX_COMPRESSION_TARGET_SIZE = 1024 # we assume that compression rate can't go futher than 85% on usefull links(1024*0.15*8/5=245,76)
 
 def _chunkstring(string: str, length: int) -> tuple[str]:
+    """Helper function, which split string in several chunks not great than indicated lenght"""
+
     return (string[0+i:length+i] for i in range(0, len(string), length))
 
 def _b32encode_dns(string: str) -> tuple:
+    """Base32 encoding of string with Unishox2 compression. Accept string to encode.
+       Returns tuple of chunked encoded data, spllited to be used as subdomains"""
+
     data, _ = unishox2.compress(string)
     encoded_string = base64.b32encode(data).decode('ascii')
+
+    #stripping '=' to save characters in subdomains
     encoded_string = encoded_string.rstrip("=").lower()
+    #splitting in chunks due to subdomain length limitations
     subdomains = _chunkstring(encoded_string, MAX_SUBDOMAIN_LENGTH)
     return tuple(subdomains)
 
 def _b32decode_dns(subdomains: tuple | list) -> str:
+    """Base32 decoding with unishox2 compression. Accept tuple of subdomains,
+       containing encoded string. Returns decoded and decompresed string"""
+    
     encoded_string = "".join(subdomains)
+
+    #padding Base32 for error-less decoding
     pad_length = math.ceil(len(encoded_string) / 8) * 8 - len(encoded_string)
     encoded_target = encoded_string + "=" * pad_length
+
     decoded_data = base64.b32decode(encoded_target, casefold = True)
     decompresed_data = unishox2.decompress(decoded_data, MAX_COMPRESSION_TARGET_SIZE)
     return decompresed_data
 
 def _is_too_long_target_error(encoded_subdomains: tuple | list):
+    """Detects targets, which was too long to encode but tool was used in """
     for domain in encoded_subdomains:
         if domain.startswith("too-long-target-"):
             target_url_hash = domain.replace("too-long-target-", "") 
@@ -35,9 +50,15 @@ def _is_too_long_target_error(encoded_subdomains: tuple | list):
 
 def encode(target: str, status_code: int, main_domain: str, 
             ignore_part: str | None = None, https_enforced: bool = False, slient_mode: bool = False) -> str:
+    """"r3dir encoder method. Accepts redirection target, status code of redirect
+        and main_domain of used redirection server. Returns domain with encoded target.
+        For optional parameters description, reference CLI tool help."""
+
     subdomains = ".".join(_b32encode_dns(target))
     
     encoded_domain = f"{subdomains}.{status_code}.{main_domain}"
+
+    #check whether encoded domain length corresponds to limitations of DNS and TLS certificates
     try:
         if https_enforced:
             if len(subdomains) > MAX_SUBDOMAIN_LENGTH:
@@ -57,6 +78,9 @@ def encode(target: str, status_code: int, main_domain: str,
     return encoded_domain
 
 def decode(domain: str, main_domain: str) -> tuple[str, int]:
+    """"r3dir decoder method. Accepts encoded domain and main domain of the redirection server.
+        Returns redirection target and status code for redirect responce"""
+
     subdomains = domain.split('.')
 
     main_domain_chunk_count = len(main_domain.split('.'))
@@ -87,7 +111,7 @@ def decode(domain: str, main_domain: str) -> tuple[str, int]:
     return target, status_code
 
 
-def main():
+def _cli():
     argParser = argparse.ArgumentParser(description='Encoded/decoder CLI tool for r3dir service')
     subparsers = argParser.add_subparsers(dest='mode', required=True, description="Encoding/decoding mode")
 
