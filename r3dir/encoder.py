@@ -132,7 +132,7 @@ def _cli():
                             help = f"String, which will be ignored during decoding. Used to bypass weak REGEXs.")
     https_opts.add_argument("-s", "--https", help="HTTPS enforced encoding(TLS certificate length limitation)",
                             action="store_true")
-    encoder.add_argument("--slient_mode", help="Slient mode for automations(e.g Hackvector tags)",
+    encoder.add_argument("--slient_mode", help="Slient mode for automations(e.g Hackvertor tags)",
                             action="store_true")
 
     decoder = subparsers.add_parser('decode', help="r3dir CLI decoder")        
