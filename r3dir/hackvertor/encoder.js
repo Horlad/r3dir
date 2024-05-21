@@ -1701,7 +1701,7 @@ function decode(domain, mainDomain) {
         startOfEncodedTarget = subdomainsWithoutMain.indexOf(IGNORE_PART_SEP) + 1;
     }
 
-    const encodedSubdomains = subdomainsWithoutMain.slice(-startOfEncodedTarget);
+    const encodedSubdomains = subdomainsWithoutMain.slice(startOfEncodedTarget);
     const targetUrlHash = isTooLongTargetError(encodedSubdomains);
     if (targetUrlHash) {
         throw new Error(`The target length has been too long for encoder. Target's SHA-1: ${targetUrlHash}`);
@@ -1734,3 +1734,4 @@ if ((typeof process !== 'undefined') && (process.release.name === 'node')){
   };
 }
 
+const result = decode("62epax54k4z4o2wubwlx57p374.302.r3dir.me", 'r3dir.me');

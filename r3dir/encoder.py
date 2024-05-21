@@ -90,7 +90,7 @@ def decode(domain: str, main_domain: str) -> tuple[str, int]:
     
     start_of_encoded_target = 0
     if IGNORE_PART_SEP in subdomains_without_main:
-        start_of_encoded_target = len(subdomains_without_main) - subdomains_without_main[::-1].index(IGNORE_PART_SEP)
+        start_of_encoded_target = subdomains_without_main.index(IGNORE_PART_SEP) + 1
     
     encoded_subdomains = subdomains_without_main[start_of_encoded_target:]
 
