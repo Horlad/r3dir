@@ -127,5 +127,5 @@ In addition, if you want to use another HTTPS reverse proxy solution, you can ru
 3. Standalone Docker container startup(HTTP server only)
 ```bash
 docker build . -t r3dir
-docker run -p 80:80 -e MAIN_DOMAIN=127.0.0.1.traefik.me r3dir
+docker run -p 80:80 -e MAIN_DOMAIN=traefik.me r3dir
 ```

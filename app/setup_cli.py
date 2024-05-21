@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
         name ='r3dir',
-        version ='0.1.1',
+        version ='0.2.0',
         author ='Horlad',
         url ='https://github.com/Horlad/r3dir',
         description ='r3dir CLI encoder/decoder',
