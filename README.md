@@ -52,7 +52,7 @@ https://some.domain.to.ignore.307.r3dir.me/--to/?url=http://localhost
 
 ### HTTPS limitations
 
-Due to limitations of wildcard TLS cerficates[link] which do not work with multipule wildcard domains(like `*.*.301.r3dir.me`) HTTPS domain-based redirection works with targets that are not longer that 63 symbols(maximum length of one subdomain) in Base32-encoded form. In addition, `--ignore_part` feature also is not available due to the limit. 
+[Due to limitations of wildcard TLS cerficates](https://en.wikipedia.org/wiki/Wildcard_certificate#Limitations) which do not work with multipule wildcard domains(like `*.*.301.r3dir.me`) HTTPS domain-based redirection works with targets that are not longer that 63 symbols(maximum length of one subdomain) in Base32-encoded form. In addition, `--ignore_part` feature also is not available due to the limit. 
 
 ## CLI tool
 
