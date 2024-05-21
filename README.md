@@ -38,13 +38,17 @@ https://307.r3dir.me/--to/?url=http://localhost
 
 Basically, you can control only host part of URL to successfully perform SSRF via HTTP redirection. While existing tools require manual configuration of redirection targets in such case, `r3dir` provides an ability to dynamically define a target via subdomains. 
 
-![r3dir_decoding_flow_1](https://user-images.githubusercontent.com/62111809/221043190-632add79-52ef-4b74-87ce-df72bb5d76f2.png)
+![r3dir_decoding_flow_upd](https://user-images.githubusercontent.com/62111809/231235695-54ad0d45-ed57-42a3-a3cd-a38538ca8215.png)
 
 As you can see, subdomains contain splited Base32-encoded and compressed target which r3dir use to create redirect. 
 
 The limitation of the solution is maximum possible length of a domain, which equals to 253 characters. Thanks to compression(around 30-40% for common SSRF payloads), it compensate Base32 encoding. Thus r3dir provides 1-to-1 ratio for encoded targets in average. It means you can use r3dir with targets up to 230 characters(considering lenght of other parts of domain).
 
 To create encoded domain, use CLI tool or embed it in BurpSuite as Hackvertor tag(see details below).
+
+### HTTPS limitations
+
+Due to [limitations of wildcard TLS cerficates](https://en.wikipedia.org/wiki/Wildcard_certificate#Limitations) which do not work with multipule wildcard domains(like `*.*.301.r3dir.me`) HTTPS domain-based redirection works with targets that are not longer that 63 symbols(maximum length of one subdomain) in encoded form. In addition, `--ignore_part` feature also is not available due to the limit. 
 
 ```bash
 #Redirects to http://169.254.169.254/latest/meta-data with `302 Found` status code
@@ -76,10 +80,6 @@ too-long-target-2b57569cfddb7d6f61331e123da605c7573521c9.302.r3dir.me #error-dom
 r3dir decoder will parse such "error domain" and will respond with `414 URI Too Long` status code and message like `The target length has been too long for encoder. Target's SHA-1: 2b57569cfddb7d6f61331e123da605c7573521c9`.
 
 Also, there is [PyPi package](https://pypi.org/project/r3dir) which can be used as library for your own Python scripts and tools. Details and examples how to use you can find on PyPi page.
-
-### HTTPS limitations
-
-Due to [limitations of wildcard TLS cerficates](https://en.wikipedia.org/wiki/Wildcard_certificate#Limitations) which do not work with multipule wildcard domains(like `*.*.301.r3dir.me`) HTTPS domain-based redirection works with targets that are not longer that 63 symbols(maximum length of one subdomain) in encoded form. In addition, `--ignore_part` feature also is not available due to the limit. 
 
 ## CLI tool
 
@@ -155,7 +155,7 @@ sed -i 's|/PATH/TO/R3DIR|/YOUR/PATH/TO/R3DIR|g' hackvertor_tag.json
 4. Add the tag to Hackvertor extension:
 - Copy content of `hackvertor_tag.json`. 
 - Open Hackvertor menu in BurpSuite sidebar and ensure that ***Allow code execution tags*** is enabled. Go to ***List custom tags***.
-[IMAGE]
+![Screenshot 2023-04-10 at 17 35 51](https://user-images.githubusercontent.com/62111809/231236253-012f7357-08ae-4336-959e-6616694184ac.png)
 - Then press ***Load tags from clipboard***. 
 
 If you have your own custom tags, export them via ***Export all my tags to clipboard***, add r3dir tag to the exported JSON document and then reimport them.
