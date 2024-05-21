@@ -40,7 +40,7 @@ Basically, you can control only host part of URL to successfully perform SSRF vi
 
 ![r3dir_decoding_flow_upd](https://user-images.githubusercontent.com/62111809/231235695-54ad0d45-ed57-42a3-a3cd-a38538ca8215.png)
 
-As you can see, subdomains contain splited Base32-encoded and compressed target which r3dir use to create redirect. 
+As you can see, subdomains contain splited Base32-encoded compressed target which r3dir use to create redirect. 
 
 To create encoded domain, use CLI tool or embed it in BurpSuite as Hackvertor tag(see details below).
 
@@ -62,10 +62,10 @@ In addition, any subdomains before `--` subdomain is ignored. The feature let by
 
 ```bash
 #Ignores `some.domain.to.ignore` part and redirects to http://169.254.169.254/latest/meta-data
-https://some.domain.to.ignore.--.62epax5fhvj3zzmzigyoe5ipkbn7fysllvges3a.302.r3dir.me
+http://some.domain.to.ignore.--.62epax5fhvj3zzmzigyoe5ipkbn7fysllvges3a.302.r3dir.me
 
 #Ignores `some.domain.to.ignore` part and edirects to http://localhost
-https://some.domain.to.ignore.--.307.r3dir.me/--to/?url=http://localhost
+http://some.domain.to.ignore.--.307.r3dir.me/--to/?url=http://localhost
 ```
 
 ### Automations with r3dir
