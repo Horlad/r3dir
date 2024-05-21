@@ -7,6 +7,7 @@ services:
     security_opt:
       - no-new-privileges:true
     command:
+      #- "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
@@ -14,7 +15,7 @@ services:
       - "--entrypoints.https.address=:443"
       - "--certificatesresolvers.letsEncrypt.acme.dnschallenge=true"
       - "--certificatesresolvers.letsEncrypt.acme.dnschallenge.provider=digitalocean"
-      - "--certificatesresolvers.letsEncrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      #- "--certificatesresolvers.letsEncrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.letsEncrypt.acme.email=${LETSENCRYPT_EMAIL}"
       - "--certificatesresolvers.letsEncrypt.acme.storage=/letsencrypt/acme.json"
     ports:
