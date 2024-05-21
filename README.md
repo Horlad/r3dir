@@ -64,7 +64,7 @@ In addition, any subdomains before `--` subdomain is ignored. The feature let by
 #Ignores `some.domain.to.ignore` part and redirects to http://169.254.169.254/latest/meta-data
 http://some.domain.to.ignore.--.62epax5fhvj3zzmzigyoe5ipkbn7fysllvges3a.302.r3dir.me
 
-#Ignores `some.domain.to.ignore` part and edirects to http://localhost
+#Ignores `some.domain.to.ignore` part and redirects to http://localhost
 http://some.domain.to.ignore.--.307.r3dir.me/--to/?url=http://localhost
 ```
 
@@ -158,6 +158,7 @@ r3dir hackvertor --print
 
 3. Add the tag to Hackvertor extension:
 - Open Hackvertor menu in BurpSuite sidebar and ensure that ***Allow code execution tags*** is enabled. Go to ***List custom tags***.
+
 ![Screenshot 2023-04-10 at 17 35 51](https://user-images.githubusercontent.com/62111809/231236253-012f7357-08ae-4336-959e-6616694184ac.png)
 - Then press ***Load tags from clipboard***. 
 
