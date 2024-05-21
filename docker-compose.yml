@@ -1,0 +1,60 @@
+version: '3.3'
+services:
+  traefik:
+    image: traefik:v2.8
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=digitalocean"
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - 80:80
+      - 443:443 
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    environment:
+      DO_AUTH_TOKEN: ${DO_AUTH_TOKEN}
+  r3dir:
+    build: .
+    container_name: r3dir
+    environment:
+      MAIN_DOMAIN: ${APP_DOMAIN}    
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.https.entrypoints=https"
+      - "traefik.http.routers.https.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.301.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.302.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.303.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.305.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.307.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.308.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.200.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.404.${APP_DOMAIN}`, `{subdomain:[a-z0-9-]+}.500.${APP_DOMAIN}`) || Host(`301.${APP_DOMAIN}`, `302.${APP_DOMAIN}`, `303.${APP_DOMAIN}`, `305.${APP_DOMAIN}`, `307.${APP_DOMAIN}`, `308.${APP_DOMAIN}`, `200.${APP_DOMAIN}`, `404.${APP_DOMAIN}`, `500.${APP_DOMAIN}`)"
+      - "traefik.http.routers.https.tls=true"
+      - "traefik.http.routers.https.tls.certresolver=letsEncrypt"
+      - "traefix.http.routers.https.tls.domains[0].main=*.301.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[0].sans=301.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[1].main=302.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[1].sans=*.302.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[2].main=303.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[2].sans=*.303.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[3].main=305.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[3].sans=*.305.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[4].main=307.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[4].sans=*.307.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[5].main=308.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[5].sans=*.308.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[6].main=200.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[6].sans=*.200.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[7].main=404.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[7].sans=*.404.${APP_DOMAIN}"
+      - "traefix.http.routers.https.tls.domains[8].main=500.${APP_DOMAIN}"
+      - "traefik.http.routers.https.tls.domains[8].sans=*.500.${APP_DOMAIN}"
+      - "traefik.http.routers.r3dir.entrypoints=http"
+      - "traefik.http.routers.r3dir.rule=PathPrefix(`/`)"
+      - "traefik.http.services.r3dir.loadbalancer.server.port=80"
