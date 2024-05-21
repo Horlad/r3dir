@@ -22,7 +22,7 @@ https://307.r3dir.me/--to/?url=http://localhost
 
 Basically, you may control only host part of URL to successfully perform SSRF via HTTP redirection. While existing tools require manual configuration of the redirection target in such case, `r3dir` provides an ability to dynamically define the target via subdomains. 
 
-[IMAGE]
+![r3dir_decoding_flow_1](https://user-images.githubusercontent.com/62111809/221043190-632add79-52ef-4b74-87ce-df72bb5d76f2.png)
 
 As you can see, subdomains contain splited Base32-encoded target, which is decoded by r3dir. The only limitation of the solution is maximum possible length of a domain, which equals to 253 characters.
 
