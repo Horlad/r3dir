@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "r3dir"
-version = "0.2.1.10"
+version = "0.2"
 authors = [
   {name="Horlad"},
 ]
