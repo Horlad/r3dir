@@ -1,4 +1,4 @@
 loguru==0.7.0
-starlette==0.26.1
+starlette==0.36.2
 uvicorn==0.21.1
 unishox2-py3==1.0.0
