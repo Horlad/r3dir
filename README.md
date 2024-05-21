@@ -3,17 +3,17 @@
 
 Redirection service designed to help bypass SSRF filters that do not validate the redirect location. It allows you to:
 
-- Define the redirection target via URL parameters or subdomains;
+- Set the redirection target via URL parameters or subdomains;
 - Control HTTP response codes;
 - Obfuscate the target URL with Base32 encoding;
-- Bypass certain allowlist filters.
+- Bypass some allowlist filters.
 
 Details about features of HTTP redirects in SSRF cases and how to utilize them via `r3dir` tool you can find in my article.
 
-The service is currently run at the `r3dir.me` and supports both HTTP and HTTPS.
+The service is currently run at the `r3dir.me` domain and supports both HTTP and HTTPS.
 
 ## Usage
-r3dir provides two approaches to set redirection targets: parameter-based and domain-based.
+`r3dir` provides two approaches to set redirection targets: parameter-based and domain-based.
 
 ### Setting HTTP status code
 Both approaches let you control HTTP status code of a response via first subdomain of `r3dir.me` URL.
@@ -36,7 +36,7 @@ https://307.r3dir.me/--to/?url=http://localhost
 
 ### Domain-based redirection
 
-Basically, you can control only host part of URL to successfully perform SSRF via HTTP redirection. While existing tools require manual configuration of redirection targets in such case, `r3dir` provides an ability to dynamically define a target via subdomains. 
+Basically, you can control only host part of URL to successfully perform SSRF via HTTP redirection. While existing tools require manual configuration of redirection targets in such case, `r3dir` provides an ability to dynamically set a target via subdomains. 
 
 ![r3dir_decoding_flow_upd](https://user-images.githubusercontent.com/62111809/231235695-54ad0d45-ed57-42a3-a3cd-a38538ca8215.png)
 
@@ -45,7 +45,7 @@ As you can see, subdomains contain splited Base32-encoded compressed target whic
 To create encoded domain, use CLI tool or embed it in BurpSuite as Hackvertor tag(see details below).
 
 ### Length limit
-Maximum domain length is 253 characters. Unishox2 compression (around 30-40% for common SSRF payloads) compensates Base32 encoding. Thus r3dir provides 1-to-1 ratio for encoded targets in average and you can use r3dir with targets up to 230 characters (considering length of other parts of domain).
+Maximum domain length is 253 characters. Unishox2 compression (around 30-40% for common SSRF payloads) compensates Base32 encoding. Thus r3dir provides 1-to-1 ratio for encoded targets on average and you can use r3dir with targets up to 230 characters (considering length of other parts of domain).
 
 ### HTTPS limitations
 
@@ -86,41 +86,53 @@ Also, there is [PyPi package](https://pypi.org/project/r3dir) which can be used 
 
 ### Installation
 ```bash
-pip3 install r3dir
+pipx install r3dir
 ```
 
 ### Encode mode 
 ```bash
 $ r3dir encode -h
-  usage: r3dir encode [-h] [-c STATUS_CODE] [-d MAIN_DOMAIN] [-a] [-i IGNORE_PART | -s] target_url
-  
+  usage: r3dir encode [-h] [-c STATUS_CODE] [-i IGNORE_PART | -s] [--slient_mode] target_url
+
   positional arguments:
-    target_url            Target URL which r3dir tool should redirect to.
-  
+    target_url            Target URL which r3dir tool should redirect to
+
   options:
     -h, --help            show this help message and exit
     -c STATUS_CODE, --status_code STATUS_CODE
-                          HTTP status code of a redirect response.
-    -d MAIN_DOMAIN, --main_domain MAIN_DOMAIN
-                          Domain where r3dir tool is hosted on.
+                          HTTP status code of a redirect response (default: 302)
     -i IGNORE_PART, --ignore_part IGNORE_PART
-                          String, which will be ignored during decoding. Used to bypass weak REGEXs.
+                          String, which will be ignored during decoding. Used to bypass weak REGEXs
     -s, --https           HTTPS enforced encoding(TLS certificate length limitation)
-    --slient_mode         Slient mode for automations(e.g Hackvertor tags)
+    --slient_mode         Slient mode for automations (e.g Hackvertor tags)
 ```
 
 ### Decode mode 
 ```bash
 $ r3dir decode -h
-  usage: r3dir decode [-h] [-d MAIN_DOMAIN] encoded_url
-  
+  usage: r3dir decode [-h] encoded_domain
+
   positional arguments:
-    encoded_url           r3dir encoded URL to decode
+    encoded_domain  r3dir encoded domain to decode
 
   options:
-    -h, --help            show this help message and exit
-    -d MAIN_DOMAIN, --main_domain MAIN_DOMAIN
-                          Domain where r3dir tool is hosted on.
+    -h, --help      show this help message and exit
+```
+
+To use CLI tool with own server, set your domain with `-d` option:
+```bash
+$ r3dir -h
+usage: r3dir [-h] [-d MAIN_DOMAIN] {encode,decode,hackvertor} ...
+
+Encoded/decoder CLI tool for r3dir service
+
+options:
+  -h, --help            show this help message and exit
+  -d MAIN_DOMAIN, --main_domain MAIN_DOMAIN
+                        Domain where r3dir tool is hosted on (default: r3dir.me)
+
+# Example of --main_domain option
+$ r3dir -d your.host encode http://localhost
 ```
 
 ## Hackvertor tag
@@ -134,32 +146,22 @@ To install r3dir Hackvertor tag in BurpSuite, follow next steps:
 pip3 install r3dir
 ```
 
-2. Run `type r3dir` to get command path (or `where r3dir` for Windows)
-- Unix:
+2. Run `r3dir hackvertor` to copy Hackvertor tags into clipboard:
+- If you have set up own server, use `-d` option to set a custom `main_domain` for Hackvertor tags.
 ```bash
-# Example output: r3dir is /opt/homebrew/bin/r3dir
-type r3dir
+r3dir -d your.host hackvertor
 ```
-- Windows:
-```powershell
-where r3dir
-```
-3. Replace `/PATH/TO/R3DIR` placeholder in `hackvertor_tag.json` with obtained path.
-- Unix:
+- If CLI tool does not copy tags in your clipboard, you can use `--print` opiton to output into terminal and copy it manually
 ```bash
-sed -i 's|/PATH/TO/R3DIR|/YOUR/PATH/TO/R3DIR|g' hackvertor_tag.json
+r3dir hackvertor --print
 ```
-- Windows:
-```powershell
-(Get-Content hackvertor_tag.json) | ForEach-Object { $_ -replace "/PATH/TO/R3DIR", "/YOUR/PATH/TO/R3DIR" } | Set-Content hackvertor_tag.json
-```
-4. Add the tag to Hackvertor extension:
-- Copy content of `hackvertor_tag.json`. 
+
+3. Add the tag to Hackvertor extension:
 - Open Hackvertor menu in BurpSuite sidebar and ensure that ***Allow code execution tags*** is enabled. Go to ***List custom tags***.
 ![Screenshot 2023-04-10 at 17 35 51](https://user-images.githubusercontent.com/62111809/231236253-012f7357-08ae-4336-959e-6616694184ac.png)
 - Then press ***Load tags from clipboard***. 
 
-If you have your own custom tags, export them via ***Export all my tags to clipboard***, add r3dir tag to the exported JSON document and then reimport them.
+If you have your own custom tags, export them via ***Export all my tags to clipboard***, add r3dir tags to the exported JSON document and then reimport them.
 
 ## HTTP server self-hosting
 

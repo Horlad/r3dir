@@ -7,41 +7,63 @@ Read details how `r3dir` works at [Github README page](https://github.com/Horlad
 
 ### Installation
 ```bash
-pip3 install r3dir
+pipx install r3dir
 ```
 
 ### Encode mode 
 ```bash
 $ r3dir encode -h
-  usage: r3dir encode [-h] [-c STATUS_CODE] [-d MAIN_DOMAIN] [-i IGNORE_PART | -s] [--slient_mode] target_url
+  usage: r3dir encode [-h] [-c STATUS_CODE] [-i IGNORE_PART | -s] [--slient_mode] target_url
 
-positional arguments:
-  target_url            Target URL which r3dir tool should redirect to.
+  positional arguments:
+    target_url            Target URL which r3dir tool should redirect to
 
-options:
-  -h, --help            show this help message and exit
-  -c STATUS_CODE, --status_code STATUS_CODE
-                        HTTP status code of a redirect response.
-  -d MAIN_DOMAIN, --main_domain MAIN_DOMAIN
-                        Domain where r3dir tool is hosted on.
-  -i IGNORE_PART, --ignore_part IGNORE_PART
-                        String, which will be ignored during decoding. Used to bypass weak REGEXs.
-  -s, --https           HTTPS enforced encoding(TLS certificate length limitation)
-  --slient_mode         Slient mode for automations(e.g Hackvertor tags)
+  options:
+    -h, --help            show this help message and exit
+    -c STATUS_CODE, --status_code STATUS_CODE
+                          HTTP status code of a redirect response (default: 302)
+    -i IGNORE_PART, --ignore_part IGNORE_PART
+                          String, which will be ignored during decoding. Used to bypass weak REGEXs
+    -s, --https           HTTPS enforced encoding(TLS certificate length limitation)
+    --slient_mode         Slient mode for automations (e.g Hackvertor tags)
 ```
 
 ### Decode mode 
 ```bash
 $ r3dir decode -h
-  usage: r3dir decode [-h] [-d MAIN_DOMAIN] encoded_url
-  
+  usage: r3dir decode [-h] encoded_domain
+
   positional arguments:
-    encoded_url           r3dir encoded URL to decode
+    encoded_domain  r3dir encoded domain to decode
 
   options:
-    -h, --help            show this help message and exit
-    -d MAIN_DOMAIN, --main_domain MAIN_DOMAIN
-                          Domain where r3dir tool is hosted on.
+    -h, --help      show this help message and exit
+```
+
+### Hackvertor mode
+```bash
+$ r3dir hackvertor -h
+  usage: r3dir hackvertor [-h] [--print]
+
+  options:
+    -h, --help  show this help message and exit
+    --print     Output Hackvertor tags into terminal
+```
+
+To use CLI tool with own server, set your domain with `-d` option:
+```bash
+$ r3dir -h
+usage: r3dir [-h] [-d MAIN_DOMAIN] {encode,decode,hackvertor} ...
+
+Encoded/decoder CLI tool for r3dir service
+
+options:
+  -h, --help            show this help message and exit
+  -d MAIN_DOMAIN, --main_domain MAIN_DOMAIN
+                        Domain where r3dir tool is hosted on (default: r3dir.me)
+
+# Example of --main_domain option
+$ r3dir -d your.host encode http://localhost
 ```
 
 ## Python package 

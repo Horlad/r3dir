@@ -1,6 +1,7 @@
-import math, base64, binascii, argparse
+import math, base64, binascii
 import unishox2
 import hashlib
+
 from .exceptions import Base32DecodingError, StatusCodeNotInRangeError, WrongEncodedURLFormat, TooLongTarget
 
 MAX_DOMAIN_LENGTH = 253
@@ -61,12 +62,12 @@ def encode(target: str, status_code: int, main_domain: str,
     #check whether encoded domain length corresponds to limitations of DNS and TLS certificates
     try:
         if https_enforced:
-            if len(subdomains) > MAX_SUBDOMAIN_LENGTH:
+            if ignore_part or len(subdomains) > MAX_SUBDOMAIN_LENGTH:
                 raise TooLongTarget(f"The target length is longer than maximum allowed for HTTPS mode. Remove ignoring part, or short the target.")
         elif ignore_part:
             encoded_domain = f"{ignore_part}.{IGNORE_PART_SEP}.{encoded_domain}"
 
-        if len(encoded_domain) > 253:
+        if len(encoded_domain) > MAX_DOMAIN_LENGTH:
             raise TooLongTarget(f"The target length is longer than maximum allowed. Remove ignoring part or short the target.")
     except TooLongTarget:
         if not slient_mode:
@@ -110,42 +111,3 @@ def decode(domain: str, main_domain: str) -> tuple[str, int]:
     
     return target, status_code
 
-
-def _cli():
-    argParser = argparse.ArgumentParser(description='Encoded/decoder CLI tool for r3dir service')
-    subparsers = argParser.add_subparsers(dest='mode', required=True, description="Encoding/decoding mode")
-
-    encoder = subparsers.add_parser('encode', help="r3dir CLI encoder")
-
-    https_opts = encoder.add_mutually_exclusive_group()
-
-    encoder.add_argument('target_url', type = str,
-                            help = "Target URL which r3dir tool should redirect to.")
-    encoder.add_argument('-c', '--status_code', type = int,
-                            default = 302,
-                            help = f"HTTP status code of a redirect response.")
-    encoder.add_argument('-d', '--main_domain', type = str,
-                            default = "r3dir.me",
-                            help = f"Domain where r3dir tool is hosted on.")                    
-    https_opts.add_argument('-i', '--ignore_part', type = str,
-                            default = None,
-                            help = f"String, which will be ignored during decoding. Used to bypass weak REGEXs.")
-    https_opts.add_argument("-s", "--https", help="HTTPS enforced encoding(TLS certificate length limitation)",
-                            action="store_true")
-    encoder.add_argument("--slient_mode", help="Slient mode for automations(e.g Hackvertor tags)",
-                            action="store_true")
-
-    decoder = subparsers.add_parser('decode', help="r3dir CLI decoder")        
-
-    decoder.add_argument('encoded_domain', type = str,
-                            help = "r3dir encoded domain to decode")
-    decoder.add_argument('-d', '--main_domain', type = str,
-                            default = "r3dir.me",
-                            help = f"Domain where r3dir tool is hosted on.")
-
-    args = argParser.parse_args()
-
-    if args.mode == 'encode':
-        print(encode(args.target_url, args.status_code, args.main_domain, args.ignore_part, https_enforced = args.https, slient_mode=args.slient_mode))
-    elif args.mode == 'decode':
-        print(decode(args.encoded_domain, args.main_domain))

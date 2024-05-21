@@ -23,11 +23,8 @@ def test_normal_target_with_ignore_part_and_https():
     main_domain = "r3dir.me"
     ignore_part = "testingtest"
     target, status_code = "http://169.254.169.254", 301
-    encoded_domain = encoder.encode(target, status_code=status_code, main_domain=main_domain, ignore_part=ignore_part, https_enforced=True)
-    decoded_target, decoded_code = encoder.decode(encoded_domain, main_domain=main_domain)
-    assert ignore_part not in encoded_domain
-    assert target == decoded_target
-    assert status_code == decoded_code
+    with pytest.raises(TooLongTarget):
+        encoded_domain = encoder.encode(target, status_code=status_code, main_domain=main_domain, ignore_part=ignore_part, https_enforced=True)
 
 def test_normal_empty_encoded_target():
     main_domain = "r3dir.me"
