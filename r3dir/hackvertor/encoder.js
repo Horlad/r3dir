@@ -1733,5 +1733,3 @@ if ((typeof process !== 'undefined') && (process.release.name === 'node')){
     decode
   };
 }
-
-const result = decode("62epax54k4z4o2wubwlx57p374.302.r3dir.me", 'r3dir.me');
