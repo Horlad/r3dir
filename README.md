@@ -122,7 +122,8 @@ docker compose up -d
 
 You can custom Traefik configuration for different environments(highly encourage to contribure solutions for another popular platforms).
 
-In addition, if you want to use another HTTPS reverse proxy solution, you can run standalone Docker container with the HTTP service which is exposed on 80 port. 
+In addition, if you want to use another HTTPS reverse proxy solution, you can run standalone Docker container with the HTTP service which is exposed on 80 port.
+
 3. Standalone Docker container startup(HTTP server only)
 ```bash
 docker build . -t r3dir
