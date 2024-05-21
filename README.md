@@ -42,9 +42,10 @@ Basically, you can control only host part of URL to successfully perform SSRF vi
 
 As you can see, subdomains contain splited Base32-encoded and compressed target which r3dir use to create redirect. 
 
-The limitation of the solution is maximum possible length of a domain, which equals to 253 characters. Thanks to compression(around 30-40% for common SSRF payloads), it compensate Base32 encoding. Thus r3dir provides 1-to-1 ratio for encoded targets in average. It means you can use r3dir with targets up to 230 characters(considering lenght of other parts of domain).
-
 To create encoded domain, use CLI tool or embed it in BurpSuite as Hackvertor tag(see details below).
+
+### Length limit
+Maximum domain length is 253 characters. Unishox2 compression (around 30-40% for common SSRF payloads) compensates Base32 encoding. Thus r3dir provides 1-to-1 ratio for encoded targets in average and you can use r3dir with targets up to 230 characters (considering length of other parts of domain).
 
 ### HTTPS limitations
 
