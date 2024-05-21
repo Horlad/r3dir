@@ -12,11 +12,11 @@ services:
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
-      - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=digitalocean"
-      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsEncrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsEncrypt.acme.dnschallenge.provider=digitalocean"
+      - "--certificatesresolvers.letsEncrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.letsEncrypt.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.letsEncrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - 80:80
       - 443:443 
