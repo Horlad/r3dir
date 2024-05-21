@@ -9,13 +9,13 @@ from starlette.exceptions import HTTPException
 from loguru import logger
 import sys
 
-import app.coder.redirect_encoder as domain_coder
-from app.coder.exceptions import Base32DecodingError, StatusCodeNotInRangeError, WrongEncodedURLFormat, TooLongTarget
+import r3dir.encoder
+from r3dir.exceptions import Base32DecodingError, StatusCodeNotInRangeError, WrongEncodedURLFormat, TooLongTarget
 
 async def parameter_redirect(request):
     domain = request.url.hostname
     try:
-        _, code = domain_coder.decode(domain, MAIN_DOMAIN)
+        _, code = r3dir.encoder.decode(domain, MAIN_DOMAIN)
     except (Base32DecodingError, StatusCodeNotInRangeError, WrongEncodedURLFormat, TooLongTarget) as e:
         raise HTTPException(400, detail = f"{request.url} -> {e}\n" + PARAMETER_BASED_CORRECT_FORMAT)
     try:
@@ -28,7 +28,7 @@ async def parameter_redirect(request):
 async def domain_redirect(request):
     domain = request.url.hostname
     try:
-        redirect_target, code = domain_coder.decode(domain, MAIN_DOMAIN)
+        redirect_target, code = r3dir.encoder.decode(domain, MAIN_DOMAIN)
     except TooLongTarget as e:
         raise HTTPException(414, detail = f"{e}")
     except (Base32DecodingError, StatusCodeNotInRangeError, WrongEncodedURLFormat) as e:

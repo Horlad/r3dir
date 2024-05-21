@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "r3dir"
+version = "0.2.0"
+authors = [
+  {name="Horlad"},
+]
+description = "r3dir encoder/decoder package with CLI tool"
+readme = "README.md" #TODO
+requires-python = ">=3.10"
+dependencies = [
+    "unishox2-py3"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+packages = ["r3dir"]
+
+[project.scripts]
+r3dir = "r3dir.encoder:_cli"
+
+[project.urls]
+"Homepage" = "https://github.com/Horlad/r3dir"
+"Bug Tracker" = "https://github.com/Horlad/r3dir/issues"
