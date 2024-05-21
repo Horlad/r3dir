@@ -3,7 +3,7 @@ Target-dynamic redirection tool which helps bypass weak SSRF filters without red
 
 It provides easy to use HTTP redirection service which let user define redirection target via URL parameter or subdomains. Details about features of HTTP redirects in SSRF cases and how to utilize them via `r3dir` tool you can find in my article.
 
-The service is currently run at the `r3dir.me` domain (and its' subdomains) and supports both `HTTP` and `HTTPS` connections.
+The service is currently run at the `r3dir.me` domain (and its subdomains) and supports both `HTTP` and `HTTPS` connections.
 
 ## Usage
 The tool provides two approaches to define redirection targets: parameter and domain based.
@@ -111,10 +111,13 @@ cd r3dir
 Out-of-box setup with Let's Encrypt wildcard TLS certificates autorenewal (for HTTPS support) requires the service to be hosted on DigitalOcean droplet with [added domain](https://docs.digitalocean.com/products/networking/dns/quickstart/).
 
 2. Fill environment file (`.env`) with your registered domain (`APP_DOMAIN`), DigitalOcean API token with `read` and `write` scopes (`DO_AUTH_TOKEN`) and email for  Let's Encrypt (`LETSENCRYPT_EMAIL`)
+```bash
+echo "APP_DOMAIN=YOUR_DOMAIN\nDO_AUTH_TOKEN=DO_TOKEN\nLETSENCRYPT_EMAIL=YOUR@EMAIL.COM" > .env
+```
 
 3. Docker Compose startup (Traefik + HTTP server)
 ```bash
-
+docker compose up -d
 ```
 
 You can custom Traefik configuration for different environments(highly encourage to contribure solutions for another popular platforms).
