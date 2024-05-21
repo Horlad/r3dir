@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "r3dir"
-version = "0.2.0"
+version = "0.1.1"
 authors = [
   {name="Horlad"},
 ]
 description = "r3dir encoder/decoder package with CLI tool"
-readme = "README.md" #TODO
+readme = "PYPIREADME.md" 
 requires-python = ">=3.10"
 dependencies = [
     "unishox2-py3"
