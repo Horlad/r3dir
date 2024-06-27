@@ -1527,7 +1527,6 @@ return str;
 
 const RFC4648 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
 const RFC4648_HEX = '0123456789ABCDEFGHIJKLMNOPQRSTUV'
-const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
 
 function base32Encode (data, variant, options) {
   options = options || {}
@@ -1542,10 +1541,6 @@ function base32Encode (data, variant, options) {
     case 'RFC4648-HEX':
       alphabet = RFC4648_HEX
       defaultPadding = true
-      break
-    case 'Crockford':
-      alphabet = CROCKFORD
-      defaultPadding = false
       break
     default:
       throw new Error('Unknown base32 variant: ' + variant)
@@ -1598,15 +1593,11 @@ function base32Decode (input, variant) {
     case 'RFC3548':
     case 'RFC4648':
       alphabet = RFC4648
-      input = input.replace(/=+$/, '')
+      input = input.replaceAll('=', '')
       break
     case 'RFC4648-HEX':
       alphabet = RFC4648_HEX
-      input = input.replace(/=+$/, '')
-      break
-    case 'Crockford':
-      alphabet = CROCKFORD
-      input = input.toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1')
+      input = input.replaceAll('=', '')
       break
     default:
       throw new Error('Unknown base32 variant: ' + variant)
