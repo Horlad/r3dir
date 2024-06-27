@@ -1523,104 +1523,115 @@ else str += tab.charAt((triplet >> 6*(3-j)) & 0x3F);
 return str;
 }
 
-// Source: https://gist.github.com/kiasaki/9e69449640fc1ec29e0def97e1ddd6bf. Modified to use Uint8Array instead of string
+// Source: https://github.com/LinusU/base32-encode and https://github.com/LinusU/base32-decode. Modified to use Uint8Array 
 
-var base32 = {
-    a: "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
-    pad: "=",
-    encode: function (uint8array) {
-        var a = this.a;
-        var pad = this.pad;
-        var len = uint8array.length;
-        var o = "";
-        var w, c, r=0, sh=0;
-        for(i=0; i<len; i+=5) {
-            // mask top 5 bits
-            c = uint8array[i];
-            w = 0xf8 & c;
-            o += a.charAt(w>>3);
-            r = 0x07 & c;
-            sh = 2;
+const RFC4648 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+const RFC4648_HEX = '0123456789ABCDEFGHIJKLMNOPQRSTUV'
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
 
-            if ((i+1)<len) {
-                c = uint8array[i+1];
-                // mask top 2 bits
-                w = 0xc0 & c;
-                o += a.charAt((r<<2) + (w>>6));
-                o += a.charAt( (0x3e & c) >> 1 );
-                r = c & 0x01;
-                sh = 4;
-            }
+function base32Encode (data, variant, options) {
+  options = options || {}
+  let alphabet, defaultPadding
 
-            if ((i+2)<len) {
-                c = uint8array[i+2];
-                // mask top 4 bits
-                w = 0xf0 & c;
-                o += a.charAt((r<<4) + (w>>4));
-                r = 0x0f & c;
-                sh = 1;
-            }
+  switch (variant) {
+    case 'RFC3548':
+    case 'RFC4648':
+      alphabet = RFC4648
+      defaultPadding = true
+      break
+    case 'RFC4648-HEX':
+      alphabet = RFC4648_HEX
+      defaultPadding = true
+      break
+    case 'Crockford':
+      alphabet = CROCKFORD
+      defaultPadding = false
+      break
+    default:
+      throw new Error('Unknown base32 variant: ' + variant)
+  }
 
-            if ((i+3)<len) {
-                c = uint8array[i+3];
-                // mask top 1 bit
-                w = 0x80 & c;
-                o += a.charAt((r<<1) + (w>>7));
-                o += a.charAt((0x7c & c) >> 2);
-                r = 0x03 & c;
-                sh = 3;
-            }
+  const padding = (options.padding !== undefined ? options.padding : defaultPadding)
+  
 
-            if ((i+4)<len) {
-                c = uint8array[i+4];
-                // mask top 3 bits
-                w = 0xe0 & c;
-                o += a.charAt((r<<3) + (w>>5));
-                o += a.charAt(0x1f & c);
-                r = 0;
-                sh = 0;
-            } 
-        }
-        // Calculate length of pad by getting the 
-        // number of words to reach an 8th octet.
-        if (r!=0) { o += a.charAt(r<<sh); }
-       
-        let padLength = Math.ceil(o.length / 8) * 8 - o.length; 
-        return o + pad.repeat(padLength);
-    },
-    decode: function(s) {
-        var len = s.length;
-        var apad = this.a + this.pad;
-        var v,x,r=0,bits=0,c;
-        var out_buf = [];
+  let bits = 0
+  let value = 0
+  let output = ''
 
+  for (let i = 0; i < data.length; i++) {
+    value = (value << 8) | data[i]
+    bits += 8
 
-        s = s.toUpperCase();
-
-        for(i=0;i<len;i+=1) {
-            v = apad.indexOf(s.charAt(i));
-            if (v>=0 && v<32) {
-                x = (x << 5) | v;
-                bits += 5;
-                if (bits >= 8) {
-                    c = (x >> (bits - 8)) & 0xff;
-                    out_buf.push(c);
-                    bits -= 8;
-                }
-            }
-        }
-        // remaining bits are < 8
-        if (bits>0) {
-            c = ((x << (8 - bits)) & 0xff) >> (8 - bits);
-            // Don't append a null terminator.
-            // See the comment at the top about why this sucks.
-            if (c!==0) {
-                out_buf.push(c);
-            }
-        }
-        return Uint8Array.from(out_buf);
+    while (bits >= 5) {
+      output += alphabet[(value >>> (bits - 5)) & 31]
+      bits -= 5
     }
-};
+  }
+
+  if (bits > 0) {
+    output += alphabet[(value << (5 - bits)) & 31]
+  }
+
+  if (padding) {
+    while ((output.length % 8) !== 0) {
+      output += '='
+    }
+  }
+
+  return output
+}
+
+function readChar (alphabet, char) {
+  var idx = alphabet.indexOf(char)
+
+  if (idx === -1) {
+    throw new Error('Invalid character found: ' + char)
+  }
+
+  return idx
+}
+
+function base32Decode (input, variant) {
+  var alphabet
+
+  switch (variant) {
+    case 'RFC3548':
+    case 'RFC4648':
+      alphabet = RFC4648
+      input = input.replace(/=+$/, '')
+      break
+    case 'RFC4648-HEX':
+      alphabet = RFC4648_HEX
+      input = input.replace(/=+$/, '')
+      break
+    case 'Crockford':
+      alphabet = CROCKFORD
+      input = input.toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1')
+      break
+    default:
+      throw new Error('Unknown base32 variant: ' + variant)
+  }
+
+  var length = input.length
+
+  var bits = 0
+  var value = 0
+
+  var index = 0
+  var output = new Uint8Array((length * 5 / 8) | 0)
+
+  for (var i = 0; i < length; i++) {
+    value = (value << 5) | readChar(alphabet, input[i])
+    bits += 5
+
+    if (bits >= 8) {
+      output[index++] = (value >>> (bits - 8)) & 255
+      bits -= 8
+    }
+  }
+
+  return output
+}
 
 
 // r3dir Javascript encoder/decoder
@@ -1628,7 +1639,6 @@ var base32 = {
 const MAX_SUBDOMAIN_LENGTH = 63;
 const IGNORE_PART_SEP = "--";
 const MAX_DOMAIN_LENGTH = 253
-const MAX_COMPRESSION_TARGET_SIZE = 1024;
 
 function chunkString(string, length) {
     const chunks = [];
@@ -1641,7 +1651,7 @@ function chunkString(string, length) {
 function b32encodeDns(string) {
     var out_buf = new Uint8Array(string.length); 
     var out_len = unishox2_compress_simple(string, string.length, out_buf);
-    const encoded = base32.encode(out_buf.slice(0, out_len)).replaceAll('=', '').toLowerCase();
+    const encoded = base32Encode(out_buf.slice(0, out_len), "RFC4648").replaceAll('=', '').toLowerCase();
     
     return chunkString(encoded, MAX_SUBDOMAIN_LENGTH);
 }
@@ -1650,7 +1660,7 @@ function b32decodeDns(subdomains) {
     const encodedString = subdomains.join('');
     const padLength = Math.ceil(encodedString.length / 8) * 8 - encodedString.length;
     const encodedTarget = encodedString + '='.repeat(padLength);
-    var out_buf = base32.decode(encodedTarget)
+    var out_buf = base32Decode(encodedTarget.toUpperCase(), "RFC4648")
     var out_str = unishox2_decompress_simple(out_buf, out_buf.length);
     return out_str
     
