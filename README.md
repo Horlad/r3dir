@@ -3,12 +3,14 @@
 
 Redirection service designed to help bypass SSRF filters that do not validate the redirect location. It allows you to:
 
-- Set the redirection target via URL parameters or subdomains;
-- Control HTTP response codes;
+- Define the redirection target via URL parameters or subdomains;
+- Control HTTP response status codes;
 - Obfuscate the target URL with Base32 encoding;
-- Bypass some allowlist filters.
+- Bypass some allowlist filters;
+- Support CORS preflight requests for headless browser redirects;
+- Integrates with BurpSuite with help of Hackvertor tags.
 
-Details about features of HTTP redirects in SSRF cases and how to utilize them via `r3dir` tool you can find in my article.
+Details about features of HTTP redirects in SSRF cases and how to utilize them via `r3dir` tool you can find in [my article](https://www.leviathansecurity.com/blog/bypassing-ssrf-filters-using-r3dir).
 
 The service is currently run at the `r3dir.me` domain and supports both HTTP and HTTPS.
 
